@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Feb 28 16:04:41 2023
+AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Sun Mar 05 22:56:24 2023
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
@@ -1037,24 +1037,16 @@ C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab
                                  #endif  /* _M328PDEF_INC_ */
                                  
                                  ; ***** END OF FILE ******************************************************
-                                 .equ delay2 = 0x20 ; delay value for debouncing
-                                 .equ digit_0 = 0x3F; pattern to display digit 0
-                                 .equ digit_1 = 0x06 ; pattern to display digit 1
-                                 .equ digit_2 = 0x5B ; pattern to display digit 2
-                                 .equ digit_3 = 0x4F ; pattern to display digit 3
-                                 .equ digit_4 = 0x66 ; pattern to display digit 4
-                                 .equ digit_5 = 0x6D ; pattern to display digit 5
-                                 .equ digit_6 = 0x7D ; pattern to display digit 6
-                                 .equ digit_7 = 0x07 ; pattern to display digit 7
-                                 .equ digit_8 = 0x7F ; pattern to display digit 8
-                                 .equ digit_9 = 0x6F ; pattern to display digit 9
-                                 .equ dash = 0x40
                                  
                                  .def value = r20       ; r20 is the value of the display 0-0, A-F
                                  .def sequence = r16    ; r16 is the value of the shift register to display a value
                                  .def input = r19	   ; r18 is the value from the RPG 
                                  .def prevInput = r21
                                  .def temp = r18
+                                 .def loopCt = r23
+                                 .def iLoopRh = r25
+                                 .def iloopRl = r24
+                                 .equ iVal = 39998
                                  .cseg 
                                  .org 0x00
                                  ; Set SER (PB2), RCLK (PB3), and SRCLK (PB4) as outputs in PORTB
@@ -1062,102 +1054,127 @@ C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab
 000001 e10c                      ldi r16, (1<<DDB2) | (1<<DDB3) | (1<<DDB4)
 000002 b904                      out DDRB, r16
 000003 0000                      nop
-                                 
+000004 ef0f                      ldi		r16, LOW(RAMEND)
+000005 bf0d                      out		SPL, r16
+000006 e008                      ldi		r16, HIGH(RAMEND)
+000007 bf0e                      out		SPH, r16
                                  reset: 
-000004 2744                      	clr value				; the digit to display first is 0
-000005 2700                      	clr sequence
-000006 b153                      	in prevInput, PINB
-000007 7051                      	andi prevInput, 0x01		; extract pin A from RPG
-000008 e8e4                      	ldi r30, low(digits<<1)
-000009 e0f0                      	ldi r31, high(digits<<1)
-00000a 9105                      	lpm sequence, Z+
-00000b d017                      	rcall display			; display a 0 to the 7-seg
-                                 main: 
-00000c b133                      	in input, PINB			; load in current state of RPG
-00000d 7031                      	andi input, 0x01		; extract current state of pin A from RPG
-00000e 1735                      	cp input, prevInput		; if curr and prev states are not equal
-00000f f411                      	brne update_count		; determine which way to update the counter
-000010 2f35                      	mov input, prevInput
-000011 cffa                      	rjmp main
+000008 2744                      	clr		value				; the digit to display first is 0
+000009 2700                      	clr		sequence
+                                 
+00000a b153                      	in		prevInput, PINB			
+00000b 7053                      	andi	prevInput, 0x03		; extract input values
+                                 
+00000c eae6                      	ldi		r30, low(digits<<1)
+00000d e0f0                      	ldi		r31, high(digits<<1)
+00000e 9105                      	lpm		sequence, Z+	
+                                 main:
+00000f d01c                      	rcall	display				; display a 0 to the 7-seg
+000010 b133                      	in		input, PINB			; load in current state of RPG
+000011 7033                      	andi	input, 0x03			; extract new input values 
+000012 e075                      	ldi		loopCt, 5
+000013 d037                      	rcall	delay10ms
+000014 1753                      	cp		prevInput, input	 
+000015 f409                      	brne	update_count		; if the current current state is not the same, determine the direction
+                                 
+000016 cff8                      	rjmp	main				
                                  
                                  update_count: 
-000012 b153                      	in prevInput, PINB			
-000013 7052                      	andi prevInput, 0x02			; extract pin B from RPG 
-000014 9556                      	lsr prevInput					; shift bit to lsb 
-000015 1735                      	cp input, prevInput				; compare pin b to pin a, if they are not equal dec
-000016 f031                      	breq decrement
-000017 9543                      	inc value				; if they are equal increment value 
-000018 3141                      	cpi value, 17
-000019 f754                      	brge reset
-00001a 9105                      	lpm sequence, Z+		; change the sequence to display
-00001b d007                      	rcall display
-00001c cfef                      	rjmp main
+000017 b133                      	in		input, PINB			; load in the current state again 
+000018 7033                      	andi	input, 0x03			; extract input pins  
+000019 2f23                      	mov		temp, input			; store input in temp register
+                                 
+00001a 7032                      	andi	input, 0x02			; extract B bit from input			
+00001b 9536                      	lsr		input				; shift B bit to LSB
+                                 
+00001c 7051                      	andi	prevInput, 0x01		; extract A bit from the prev input
+                                 
+00001d 1735                      	cp		input, prevInput			
+00001e f031                      	breq	decrement			; if the A and B bit are equal RPG is moving CCW
+                                 
+00001f 3140                      	cpi		value, 0x10			; if the value is 16, we have reached the max value that can be displayed do nothing
+000020 f774                      	brge	main					
+                                 
+000021 9543                      	inc		value 
+000022 9105                      	lpm		sequence, Z+ 
+                                 
+000023 2f52                      	mov		prevInput, temp		; store current input in prev input for next iteration 
+000024 cfea                      	rjmp	main
                                  
                                  decrement:
-00001d 3040                      	cpi value, 0x00			; if the value is already 0
-00001e f369                      	breq main
-00001f 954a                      	dec value				; else decrement the value
-000020 9104                      	lpm sequence, Z
-000021 d001                      	rcall display
-000022 cfe9                      	rjmp main
+000025 3040                      	cpi		value, 0x00
+000026 f309                      	breq	reset
+                                 
+000027 954a                      	dec		value				; else decrement the value
+000028 9731                      	sbiw	Z, 0x01				; decrement Z pointer by 1  
+000029 9104                      	lpm		sequence, Z
+                                 
+00002a 2f52                      	mov		prevInput, temp		; store current input in prev input for next iteration 
+00002b cfe3                      	rjmp	main
                                  
                                  display:
-000023 930f                      	push sequence			; Backup used registers on stack
-000024 931f                      	push R17
-000025 b71f                      	in R17, SREG
-000026 931f                      	push R17
-000027 e018                      	ldi R17, 8				; loop --> test all 8 bits
-000028 0000                      	nop
-000029 0000                      	nop
+00002c 930f                      	push sequence			; Backup used registers on stack
+00002d 931f                      	push R17
+00002e b71f                      	in R17, SREG
+00002f 931f                      	push R17
+000030 e018                      	ldi R17, 8				; loop --> test all 8 bits
+000031 0000                      	nop
+000032 0000                      	nop
                                  loop:
-00002a 1f00                      	rol sequence			; rotate left through Carry
-00002b f018                      	BRCS set_ser_in_1		; branch if Carry is set
+000033 1f00                      	rol sequence			; rotate left through Carry
+000034 f018                      	BRCS set_ser_in_1		; branch if Carry is set
                                  
-00002c 982a                      	cbi PORTB, PB2			; clear PB0 (SER)
-00002d 0000                      	nop
-00002e c002                      	rjmp end
+000035 982a                      	cbi PORTB, PB2			; clear PB0 (SER)
+000036 0000                      	nop
+000037 c002                      	rjmp end
                                  	set_ser_in_1:
-00002f 9a2a                      		sbi PORTB, PB2		; set PB0 (SER)
-000030 0000                      		nop
+000038 9a2a                      		sbi PORTB, PB2		; set PB0 (SER)
+000039 0000                      		nop
                                  
                                  end:
-000031 9a2c                      	sbi PORTB, PB4			; set PB2 (SRCLK)
-000032 0000                      	nop
-000033 982c                      	cbi PORTB, PB4			; clear PB2 (SRCLK)
-000034 0000                      	nop
+00003a 9a2c                      	sbi PORTB, PB4			; set PB2 (SRCLK)
+00003b 0000                      	nop
+00003c 982c                      	cbi PORTB, PB4			; clear PB2 (SRCLK)
+00003d 0000                      	nop
                                  
-000035 951a                      	dec R17
-000036 f799                      	brne loop
+00003e 951a                      	dec R17
+00003f f799                      	brne loop
                                  	; pulse rclk, which sends values to storage register for displaying
-000037 9a2b                      	sbi PORTB, PB3 ; set PB1 (RCLK)
-000038 0000                      	nop
-000039 982b                      	cbi PORTB, PB3 ; clear PB1 (RCLK)
-00003a 0000                      	nop
+000040 9a2b                      	sbi PORTB, PB3 ; set PB1 (RCLK)
+000041 0000                      	nop
+000042 982b                      	cbi PORTB, PB3 ; clear PB1 (RCLK)
+000043 0000                      	nop
                                  	; Restore registers from stack
-00003b 911f                      	pop R17
-00003c bf1f                      	out SREG, R17
-00003d 911f                      	pop R17
-00003e 910f                      	pop sequence
-00003f 982a                      	cbi PORTB, PB2 ; clear pb0, ser
-000040 0000                      	nop
-000041 9508                      	ret
+000044 911f                      	pop R17
+000045 bf1f                      	out SREG, R17
+000046 911f                      	pop R17
+000047 910f                      	pop sequence
+000048 982a                      	cbi PORTB, PB2 ; clear pb0, ser
+000049 0000                      	nop
+00004a 9508                      	ret
+                                 delay10ms: 
+00004b e38e                      	ldi		iLoopRl, LOW(iVal)
+00004c e99c                      	ldi		iLoopRh, HIGH(iVal)
+                                 iLoop: 
+00004d 9701                      	sbiw	iLoopRl, 1 
+00004e f7f1                      	brne	iLoop
                                  
-                                 ; digit lookup table, first index is a digital 0, last index is an 9
-                                 ; TODO: Add a - f values
+00004f 957a                      	dec		loopCt
+000050 f7d1                      	brne	delay10ms
+                                 
+000051 0000                      	nop
+                                 
+000052 9508                      	ret
                                  digits: 
-000042 063f
-000043 4f5b
-C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm(117): warning: .cseg .db misalignment - padding zero byte
-000044 0066                      	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66
-000045 7d6d
-000046 7f07
-C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm(118): warning: .cseg .db misalignment - padding zero byte
-000047 006f                      	.db 0x6D, 0x7D, 0x07, 0x7F, 0x6F
-000048 fc77
-000049 5e39
-00004a 7979
-C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm(119): warning: .cseg .db misalignment - padding zero byte
-00004b 0071                      	.db 0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71
+000053 063f
+000054 4f5b                      	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66, \
+000055 6d66
+000056 077d                      	0x6D, 0x7D, 0x07, 0x7F, 0x6F, \
+000057 6f7f
+000058 fc77
+000059 5e39
+00005a 7979
+00005b 0071                      	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
 
 
 RESOURCE USE INFORMATION
@@ -1175,40 +1192,40 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega328P" register use summary:
-x  :   0 y  :   0 z  :   3 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
+x  :   0 y  :   0 z  :   4 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:  10 r17:   8 r18:   0 r19:   5 r20:   5 
-r21:   8 r22:   0 r23:   0 r24:   0 r25:   0 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:  14 r17:   8 r18:   3 r19:   9 r20:   5 
+r21:   7 r22:   0 r23:   2 r24:   2 r25:   1 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   1 r31:   1 
-Registers used: 8 out of 35 (22.9%)
+Registers used: 12 out of 35 (34.3%)
 
 "ATmega328P" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
-andi  :   3 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
+andi  :   5 asr   :   0 bclr  :   0 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   0 brcs  :   1 break :   0 breq  :   2 brge  :   1 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
-brne  :   2 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
+brne  :   4 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
 brvs  :   0 bset  :   0 bst   :   0 call  :   0 cbi   :   4 cbr   :   0 
 clc   :   0 clh   :   0 cli   :   0 cln   :   0 clr   :   3 cls   :   0 
 clt   :   0 clv   :   0 clz   :   0 com   :   0 cp    :   2 cpc   :   0 
-cpi   :   2 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0 
+cpi   :   2 cpse  :   0 dec   :   3 eor   :   0 fmul  :   0 fmuls :   0 
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   4 inc   :   1 jmp   :   0 
-ld    :   0 ldd   :   0 ldi   :   4 lds   :   0 lpm   :   4 lsl   :   0 
-lsr   :   1 mov   :   1 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :  10 or    :   0 ori   :   0 out   :   2 pop   :   3 
-push  :   3 rcall :   3 ret   :   1 reti  :   0 rjmp  :   4 rol   :   1 
+ld    :   0 ldd   :   0 ldi   :   9 lds   :   0 lpm   :   4 lsl   :   0 
+lsr   :   1 mov   :   3 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
+neg   :   0 nop   :  11 or    :   0 ori   :   0 out   :   4 pop   :   3 
+push  :   3 rcall :   2 ret   :   2 reti  :   0 rjmp  :   4 rol   :   1 
 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   3 sbic  :   0 sbis  :   0 
-sbiw  :   0 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
+sbiw  :   2 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
 sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
 sez   :   0 sleep :   0 spm   :   0 st    :   0 std   :   0 sts   :   0 
 sub   :   0 subi  :   0 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 25 out of 113 (22.1%)
+Instructions used: 26 out of 113 (23.0%)
 
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000098    132     20    152   32768   0.5%
+[.cseg] 0x000000 0x0000b8    166     18    184   32768   0.6%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 
-Assembly complete, 0 errors, 3 warnings
+Assembly complete, 0 errors, 0 warnings

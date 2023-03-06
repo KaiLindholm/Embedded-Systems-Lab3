@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Feb 28 16:04:41 2023
+AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Sun Mar 05 22:56:24 2023
 
 
 EQU  SIGNATURE_000 0000001e
@@ -695,29 +695,23 @@ EQU  ACIaddr      0000002e
 EQU  TWIaddr      00000030
 EQU  SPMRaddr     00000032
 EQU  INT_VECTORS_SIZE 00000034
-EQU  delay2       00000020
-EQU  digit_0      0000003f
-EQU  digit_1      00000006
-EQU  digit_2      0000005b
-EQU  digit_3      0000004f
-EQU  digit_4      00000066
-EQU  digit_5      0000006d
-EQU  digit_6      0000007d
-EQU  digit_7      00000007
-EQU  digit_8      0000007f
-EQU  digit_9      0000006f
-EQU  dash         00000040
 DEF  value        r20
 DEF  sequence     r16
 DEF  input        r19
 DEF  prevInput    r21
 DEF  temp         r18
-CSEG reset        00000004
-CSEG digits       00000042
-CSEG display      00000023
-CSEG main         0000000c
-CSEG update_count 00000012
-CSEG decrement    0000001d
-CSEG loop         0000002a
-CSEG set_ser_in_1 0000002f
-CSEG end          00000031
+DEF  loopCt       r23
+DEF  iLoopRh      r25
+DEF  iloopRl      r24
+EQU  iVal         00009c3e
+CSEG reset        00000008
+CSEG digits       00000053
+CSEG main         0000000f
+CSEG display      0000002c
+CSEG delay10ms    0000004b
+CSEG update_count 00000017
+CSEG decrement    00000025
+CSEG loop         00000033
+CSEG set_ser_in_1 00000038
+CSEG end          0000003a
+CSEG iLoop        0000004d

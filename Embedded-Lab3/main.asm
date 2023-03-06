@@ -6,24 +6,16 @@
 
 
 .include "m328Pdef.inc"
-.equ delay2 = 0x20 ; delay value for debouncing
-.equ digit_0 = 0x3F; pattern to display digit 0
-.equ digit_1 = 0x06 ; pattern to display digit 1
-.equ digit_2 = 0x5B ; pattern to display digit 2
-.equ digit_3 = 0x4F ; pattern to display digit 3
-.equ digit_4 = 0x66 ; pattern to display digit 4
-.equ digit_5 = 0x6D ; pattern to display digit 5
-.equ digit_6 = 0x7D ; pattern to display digit 6
-.equ digit_7 = 0x07 ; pattern to display digit 7
-.equ digit_8 = 0x7F ; pattern to display digit 8
-.equ digit_9 = 0x6F ; pattern to display digit 9
-.equ dash = 0x40
 
 .def value = r20       ; r20 is the value of the display 0-0, A-F
 .def sequence = r16    ; r16 is the value of the shift register to display a value
 .def input = r19	   ; r18 is the value from the RPG 
 .def prevInput = r21
 .def temp = r18
+.def loopCt = r23
+.def iLoopRh = r25
+.def iloopRl = r24
+.equ iVal = 39998
 .cseg 
 .org 0x00
 ; Set SER (PB2), RCLK (PB3), and SRCLK (PB4) as outputs in PORTB
@@ -31,44 +23,63 @@ clr r16
 ldi r16, (1<<DDB2) | (1<<DDB3) | (1<<DDB4)
 out DDRB, r16
 nop
-
+ldi		r16, LOW(RAMEND)
+out		SPL, r16
+ldi		r16, HIGH(RAMEND)
+out		SPH, r16
 reset: 
-	clr value				; the digit to display first is 0
-	clr sequence
-	in prevInput, PINB
-	andi prevInput, 0x01		; extract pin A from RPG
-	ldi r30, low(digits<<1)
-	ldi r31, high(digits<<1)
-	lpm sequence, Z+
-	rcall display			; display a 0 to the 7-seg
-main: 
-	in input, PINB			; load in current state of RPG
-	andi input, 0x01		; extract current state of pin A from RPG
-	cp input, prevInput		; if curr and prev states are not equal
-	brne update_count		; determine which way to update the counter
-	mov input, prevInput
-	rjmp main
+	clr		value				; the digit to display first is 0
+	clr		sequence
+
+	in		prevInput, PINB			
+	andi	prevInput, 0x03		; extract input values
+
+	ldi		r30, low(digits<<1)
+	ldi		r31, high(digits<<1)
+	lpm		sequence, Z+	
+main:
+	rcall	display				; display a 0 to the 7-seg
+	in		input, PINB			; load in current state of RPG
+	andi	input, 0x03			; extract new input values 
+	ldi		loopCt, 5
+	rcall	delay10ms
+	cp		prevInput, input	 
+	brne	update_count		; if the current current state is not the same, determine the direction
+
+	rjmp	main				
 
 update_count: 
-	in prevInput, PINB			
-	andi prevInput, 0x02			; extract pin B from RPG 
-	lsr prevInput					; shift bit to lsb 
-	cp input, prevInput				; compare pin b to pin a, if they are not equal dec
-	breq decrement
-	inc value				; if they are equal increment value 
-	cpi value, 17
-	brge reset
-	lpm sequence, Z+		; change the sequence to display
-	rcall display
-	rjmp main
+	in		input, PINB			; load in the current state again 
+	andi	input, 0x03			; extract input pins  
+	mov		temp, input			; store input in temp register
+
+	andi	input, 0x02			; extract B bit from input			
+	lsr		input				; shift B bit to LSB
+
+	andi	prevInput, 0x01		; extract A bit from the prev input
+
+	cp		input, prevInput			
+	breq	decrement			; if the A and B bit are equal RPG is moving CCW
+
+	cpi		value, 0x10			; if the value is 16, we have reached the max value that can be displayed do nothing
+	brge	main					
+
+	inc		value 
+	lpm		sequence, Z+ 
+
+	mov		prevInput, temp		; store current input in prev input for next iteration 
+	rjmp	main
 
 decrement:
-	cpi value, 0x00			; if the value is already 0
-	breq main
-	dec value				; else decrement the value
-	lpm sequence, Z
-	rcall display
-	rjmp main
+	cpi		value, 0x00
+	breq	reset
+
+	dec		value				; else decrement the value
+	sbiw	Z, 0x01				; decrement Z pointer by 1  
+	lpm		sequence, Z
+
+	mov		prevInput, temp		; store current input in prev input for next iteration 
+	rjmp	main
 
 display:
 	push sequence			; Backup used registers on stack
@@ -110,10 +121,20 @@ end:
 	cbi PORTB, PB2 ; clear pb0, ser
 	nop
 	ret
+delay10ms: 
+	ldi		iLoopRl, LOW(iVal)
+	ldi		iLoopRh, HIGH(iVal)
+iLoop: 
+	sbiw	iLoopRl, 1 
+	brne	iLoop
 
-; digit lookup table, first index is a digital 0, last index is an 9
-; TODO: Add a - f values
+	dec		loopCt
+	brne	delay10ms
+
+	nop
+
+	ret
 digits: 
-	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66
-	.db 0x6D, 0x7D, 0x07, 0x7F, 0x6F
-	.db 0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71
+	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66, \
+	0x6D, 0x7D, 0x07, 0x7F, 0x6F, \
+	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
