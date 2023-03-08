@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 19:39:55 2023
+AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 19:43:07 2023
 
 
 EQU  SIGNATURE_000 0000001e
@@ -705,10 +705,10 @@ DEF  passbool     r23
 DEF  passCount    r24
 DEF  mask         r25
 CSEG reset        00000008
-CSEG digits       0000008a
-CSEG _delay9second 00000063
+CSEG digits       0000008c
+CSEG _delay10ms   0000004a
 CSEG main         00000017
-CSEG display      0000006b
+CSEG display      0000006d
 CSEG direction    0000001e
 CSEG check_sequence 00000021
 CSEG increment    00000026
@@ -719,17 +719,17 @@ CSEG equal        00000038
 CSEG nonequal     0000003a
 CSEG correct_password 0000003e
 CSEG incorrect_password 0000003f
+CSEG _delay9second 00000065
 CSEG _delay1ms    00000041
-CSEG wait         00000044
-CSEG _delay10ms   00000048
-CSEG wait10ms     0000004a
-CSEG _delay1second 00000050
-CSEG wait1sec     00000052
-CSEG _delay2second 00000058
-CSEG _delay5second 0000005b
-CSEG wait5sec     0000005d
-CSEG wait9sec     00000065
-CSEG loop         00000072
-CSEG set_ser_in_1 00000077
-CSEG end          00000079
-CSEG pass         00000093
+CSEG wait         00000045
+CSEG wait10ms     0000004c
+CSEG _delay1second 00000052
+CSEG wait1sec     00000054
+CSEG _delay2second 0000005a
+CSEG _delay5second 0000005d
+CSEG wait5sec     0000005f
+CSEG wait9sec     00000067
+CSEG loop         00000074
+CSEG set_ser_in_1 00000079
+CSEG end          0000007b
+CSEG pass         00000095

@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 19:39:55 2023
+AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 19:43:07 2023
 
 [builtin](2): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
 C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm(8): Including file 'C:/Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.7.374\avrasm\inc\m328Pdef.inc'
@@ -1072,12 +1072,12 @@ C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab
 000010 e040                      	ldi		value, 0x00			; the digit to display first is 0
 000011 2700                      	clr		sequence
 000012 ef9f                      	ldi		mask, 0xff
-000013 e1e4                      	ldi		r30, low(digits<<1)
+000013 e1e8                      	ldi		r30, low(digits<<1)
 000014 e0f1                      	ldi		r31, high(digits<<1)
 000015 9104                      	lpm		sequence, Z			; load 0 into sequence 
-000016 d04c                      	rcall	_delay9second
+000016 d033                      	rcall _delay10ms
                                  main:	
-000017 d053                      	rcall	display				; display a 0 to the 7-seg
+000017 d055                      	rcall	display				; display a 0 to the 7-seg
 000018 b133                      	in		input, PINB			; load in current state of RPG
 000019 7033                      	andi	input, 0x03			; extract new input values
 00001a 7093                      	andi	mask, 0b11
@@ -1141,128 +1141,129 @@ C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab
                                  incorrect_password: 
                                  
                                  	
-00003f d023                      	rcall _delay9second
+00003f d025                      	rcall _delay9second
 000040 cfc7                      	rjmp reset
                                  ; prescalar: 64 start value: 131
                                  
                                  _delay1ms: 
-000041 e096                      	ldi		mask, 6
-000042 bd96                      	out		TCNT0, mask
-000043 2799                      	clr		mask
+000041 932f                      	push	temp
+000042 e026                      	ldi		temp, 6
+000043 bd26                      	out		TCNT0, temp
+000044 2722                      	clr		temp
                                  	wait: 
-000044 b596                      		in		mask, TCNT0
-000045 3090                      		cpi		mask, 0x00	; has the overflow bit been set
-000046 f7e9                      		brne	wait
-                                 
-000047 9508                      	ret 
+000045 b526                      		in		temp, TCNT0
+000046 3020                      		cpi		temp, 0x00	; has the overflow bit been set
+000047 f7e9                      		brne	wait
+000048 912f                      	pop		temp
+000049 9508                      	ret 
                                  		 
                                  _delay10ms:
-000048 932f                      	push temp
-000049 2722                      	clr temp
+00004a 932f                      	push temp
+00004b 2722                      	clr temp
                                  	wait10ms: 
-00004a dff6                      		rcall	_delay1ms 
-00004b 9523                      		inc		temp
-00004c 302a                      		cpi		temp, 10
-00004d f7e1                      		brne	wait10ms
-00004e 912f                      	pop temp
-00004f 9508                      	ret 
+00004c dff4                      		rcall	_delay1ms 
+00004d 9523                      		inc		temp
+00004e 302a                      		cpi		temp, 10
+00004f f7e1                      		brne	wait10ms
+000050 912f                      	pop temp
+000051 9508                      	ret 
                                  		
                                  _delay1second: 
-000050 932f                      	push temp
-000051 2722                      	clr temp
+000052 932f                      	push temp
+000053 2722                      	clr temp
                                  	wait1sec: 
-000052 dff5                      		rcall _delay10ms 
-000053 9523                      		inc temp
-000054 302a                      		cpi temp, 10
-000055 f7e1                      		brne wait1sec
+000054 dff5                      		rcall _delay10ms 
+000055 9523                      		inc temp
+000056 302a                      		cpi temp, 10
+000057 f7e1                      		brne wait1sec
                                  
-000056 912f                      	pop temp
-000057 9508                      	ret
+000058 912f                      	pop temp
+000059 9508                      	ret
                                  
                                  _delay2second: 
-000058 dff7                      	rcall _delay1second
-000059 dff6                      	rcall _delay1second 
-00005a 9508                      	ret 
+00005a dff7                      	rcall _delay1second
+00005b dff6                      	rcall _delay1second 
+00005c 9508                      	ret 
                                  
                                  _delay5second:
-00005b 932f                      	push temp 
-00005c 2722                      	clr temp 
+00005d 932f                      	push temp 
+00005e 2722                      	clr temp 
                                  	wait5sec: 
-00005d dff2                      		rcall _delay1second
-00005e 9523                      		inc temp
-00005f 3025                      		cpi temp, 5 
-000060 f7e1                      		brne wait5sec
+00005f dff2                      		rcall _delay1second
+000060 9523                      		inc temp
+000061 3025                      		cpi temp, 5 
+000062 f7e1                      		brne wait5sec
                                  
-000061 912f                      	pop temp
-000062 9508                      	ret
+000063 912f                      	pop temp
+000064 9508                      	ret
                                  
                                  _delay9second: 
-000063 932f                      	push temp
-000064 2722                      	clr temp 
+000065 932f                      	push temp
+000066 2722                      	clr temp 
                                  	wait9sec: 
-000065 dfea                      		rcall _delay1second
-000066 9523                      		inc temp
-000067 3029                      		cpi temp, 9 
-000068 f7a1                      		brne wait5sec
-000069 912f                      	pop temp
-00006a 9508                      	ret
+000067 dfea                      		rcall _delay1second
+000068 9523                      		inc temp
+000069 3029                      		cpi temp, 9 
+00006a f7e1                      		brne wait9sec
+00006b 912f                      	pop temp
+00006c 9508                      	ret
                                  
                                  display:
-00006b 930f                      	push sequence			; Backup used registers on stack
-00006c 931f                      	push R17
-00006d b71f                      	in R17, SREG
+00006d 930f                      	push sequence			; Backup used registers on stack
 00006e 931f                      	push R17
-00006f e018                      	ldi R17, 8				; loop --> test all 8 bits
-000070 0000                      	nop
-000071 0000                      	nop
+00006f b71f                      	in R17, SREG
+000070 931f                      	push R17
+000071 e018                      	ldi R17, 8				; loop --> test all 8 bits
+000072 0000                      	nop
+000073 0000                      	nop
                                  loop:
-000072 1f00                      	rol sequence			; rotate left through Carry
-000073 f018                      	BRCS set_ser_in_1		; branch if Carry is set
+000074 1f00                      	rol sequence			; rotate left through Carry
+000075 f018                      	BRCS set_ser_in_1		; branch if Carry is set
                                  
-000074 982a                      	cbi PORTB, PB2			; clear PB0 (SER)
-000075 0000                      	nop
-000076 c002                      	rjmp end
+000076 982a                      	cbi PORTB, PB2			; clear PB0 (SER)
+000077 0000                      	nop
+000078 c002                      	rjmp end
                                  	set_ser_in_1:
-000077 9a2a                      		sbi PORTB, PB2		; set PB0 (SER)
-000078 0000                      		nop
+000079 9a2a                      		sbi PORTB, PB2		; set PB0 (SER)
+00007a 0000                      		nop
                                  
                                  end:
-000079 9a2c                      	sbi PORTB, PB4			; set PB2 (SRCLK)
-00007a 0000                      	nop
-00007b 982c                      	cbi PORTB, PB4			; clear PB2 (SRCLK)
+00007b 9a2c                      	sbi PORTB, PB4			; set PB2 (SRCLK)
 00007c 0000                      	nop
+00007d 982c                      	cbi PORTB, PB4			; clear PB2 (SRCLK)
+00007e 0000                      	nop
                                  
-00007d 951a                      	dec R17
-00007e f799                      	brne loop
+00007f 951a                      	dec R17
+000080 f799                      	brne loop
                                  	; pulse rclk, which sends values to storage register for displaying
-00007f 9a2b                      	sbi PORTB, PB3 ; set PB1 (RCLK)
-000080 0000                      	nop
-                                 
-000081 982b                      	cbi PORTB, PB3 ; clear PB1 (RCLK)
+000081 9a2b                      	sbi PORTB, PB3 ; set PB1 (RCLK)
 000082 0000                      	nop
+                                 
+000083 982b                      	cbi PORTB, PB3 ; clear PB1 (RCLK)
+000084 0000                      	nop
                                  	; Restore registers from stack
-000083 911f                      	pop R17
-000084 bf1f                      	out SREG, R17
 000085 911f                      	pop R17
-000086 910f                      	pop sequence
-000087 982a                      	cbi PORTB, PB2 ; clear pb0, ser
-000088 0000                      	nop
-000089 9508                      	ret
+000086 bf1f                      	out SREG, R17
+000087 911f                      	pop R17
+000088 910f                      	pop sequence
+000089 982a                      	cbi PORTB, PB2 ; clear pb0, ser
+00008a 0000                      	nop
+00008b 9508                      	ret
                                  
                                  digits: 
-00008a 063f
-00008b 4f5b                      	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66, \
-00008c 6d66
-00008d 077d                      	0x6D, 0x7D, 0x07, 0x7F, 0x6F, \
-00008e 6f7f
-00008f fc77
-000090 5e39
-000091 7979
-000092 0071                      	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
+00008c 063f
+00008d 4f5b                      	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66, \
+00008e 6d66
+00008f 077d                      	0x6D, 0x7D, 0x07, 0x7F, 0x6F, \
+000090 6f7f
+000091 fc77
+000092 5e39
+000093 7979
+000094 0071                      	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
                                  ;55969
                                  pass: 
-000093 6d6d
-000094 7d6f
+000095 6d6d
+000096 7d6f
 
 
 RESOURCE USE INFORMATION
@@ -1282,8 +1283,8 @@ counted separately from r26..r31 here.
 "ATmega328P" register use summary:
 x  :   0 y  :   0 z  :   4 r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   0 
 r5 :   0 r6 :   0 r7 :   0 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 
-r13:   0 r14:   0 r15:   0 r16:   8 r17:   8 r18:  34 r19:   4 r20:   5 
-r21:   0 r22:   1 r23:   3 r24:   3 r25:  15 r26:   0 r27:   0 r28:   0 
+r13:   0 r14:   0 r15:   0 r16:   8 r17:   8 r18:  41 r19:   4 r20:   5 
+r21:   0 r22:   1 r23:   3 r24:   3 r25:  10 r26:   0 r27:   0 r28:   0 
 r29:   0 r30:   1 r31:   1 
 Registers used: 12 out of 35 (34.3%)
 
@@ -1300,8 +1301,8 @@ cpi   :  11 cpse  :   0 dec   :   2 eor   :   0 fmul  :   0 fmuls :   0
 fmulsu:   0 icall :   0 ijmp  :   0 in    :   3 inc   :   6 jmp   :   0 
 ld    :   0 ldd   :   0 ldi   :  14 lds   :   0 lpm   :   5 lsl   :   4 
 lsr   :   0 mov   :   0 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 
-neg   :   0 nop   :  10 or    :   1 ori   :   1 out   :   7 pop   :   7 
-push  :   7 rcall :   9 ret   :   7 reti  :   0 rjmp  :   8 rol   :   1 
+neg   :   0 nop   :  10 or    :   1 ori   :   1 out   :   7 pop   :   8 
+push  :   8 rcall :   9 ret   :   7 reti  :   0 rjmp  :   8 rol   :   1 
 ror   :   0 sbc   :   0 sbci  :   0 sbi   :   3 sbic  :   0 sbis  :   0 
 sbiw  :   1 sbr   :   0 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 
 sei   :   0 sen   :   0 ser   :   0 ses   :   0 set   :   0 sev   :   0 
@@ -1312,7 +1313,7 @@ Instructions used: 28 out of 113 (24.8%)
 "ATmega328P" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x00012c    276     24    300   32768   0.9%
+[.cseg] 0x000000 0x000130    280     24    304   32768   0.9%
 [.dseg] 0x000100 0x000100      0      0      0    2048   0.0%
 [.eseg] 0x000000 0x000000      0      0      0    1024   0.0%
 

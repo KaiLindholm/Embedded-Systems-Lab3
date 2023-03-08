@@ -44,7 +44,7 @@ reset:
 	ldi		r30, low(digits<<1)
 	ldi		r31, high(digits<<1)
 	lpm		sequence, Z			; load 0 into sequence 
-	rcall	_delay9second
+	rcall _delay10ms
 main:	
 	rcall	display				; display a 0 to the 7-seg
 	in		input, PINB			; load in current state of RPG
@@ -115,14 +115,15 @@ incorrect_password:
 ; prescalar: 64 start value: 131
 
 _delay1ms: 
-	ldi		mask, 6
-	out		TCNT0, mask
-	clr		mask
+	push	temp
+	ldi		temp, 6
+	out		TCNT0, temp
+	clr		temp
 	wait: 
-		in		mask, TCNT0
-		cpi		mask, 0x00	; has the overflow bit been set
+		in		temp, TCNT0
+		cpi		temp, 0x00	; has the overflow bit been set
 		brne	wait
-
+	pop		temp
 	ret 
 		 
 _delay10ms:
@@ -172,7 +173,7 @@ _delay9second:
 		rcall _delay1second
 		inc temp
 		cpi temp, 9 
-		brne wait5sec
+		brne wait9sec
 	pop temp
 	ret
 
