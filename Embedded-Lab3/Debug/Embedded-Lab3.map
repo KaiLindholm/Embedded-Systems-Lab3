@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 19:43:07 2023
+AVRASM ver. 2.2.8  C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm Tue Mar 07 21:05:16 2023
 
 
 EQU  SIGNATURE_000 0000001e
@@ -700,36 +700,37 @@ DEF  sequence     r16
 DEF  input        r19
 DEF  prevInput    r21
 DEF  temp         r18
+DEF  rpgBool      r17
 DEF  passcode     r22
 DEF  passbool     r23
 DEF  passCount    r24
 DEF  mask         r25
 CSEG reset        00000008
-CSEG digits       0000008c
-CSEG _delay10ms   0000004a
-CSEG main         00000017
-CSEG display      0000006d
-CSEG direction    0000001e
-CSEG check_sequence 00000021
-CSEG increment    00000026
-CSEG decrement    0000002c
-CSEG check_pass   00000033
-CSEG final        0000003b
-CSEG equal        00000038
-CSEG nonequal     0000003a
-CSEG correct_password 0000003e
-CSEG incorrect_password 0000003f
-CSEG _delay9second 00000065
-CSEG _delay1ms    00000041
-CSEG wait         00000045
-CSEG wait10ms     0000004c
-CSEG _delay1second 00000052
-CSEG wait1sec     00000054
-CSEG _delay2second 0000005a
-CSEG _delay5second 0000005d
-CSEG wait5sec     0000005f
-CSEG wait9sec     00000067
-CSEG loop         00000074
-CSEG set_ser_in_1 00000079
-CSEG end          0000007b
-CSEG pass         00000095
+CSEG digits       00000090
+CSEG main         00000018
+CSEG check_pass   00000034
+CSEG display      00000071
+CSEG direction    00000021
+CSEG rtn          0000001f
+CSEG increment    00000027
+CSEG decrement    0000002d
+CSEG _delay1second 00000056
+CSEG final        0000003f
+CSEG equal        0000003c
+CSEG nonequal     0000003e
+CSEG correct_password 00000042
+CSEG incorrect_password 00000043
+CSEG _delay9second 00000069
+CSEG _delay1ms    00000045
+CSEG wait         00000049
+CSEG _delay10ms   0000004e
+CSEG wait10ms     00000050
+CSEG wait1sec     00000058
+CSEG _delay2second 0000005e
+CSEG _delay5second 00000061
+CSEG wait5sec     00000063
+CSEG wait9sec     0000006b
+CSEG loop         00000078
+CSEG set_ser_in_1 0000007d
+CSEG end          0000007f
+CSEG pass         00000099
