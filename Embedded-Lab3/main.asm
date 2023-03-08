@@ -123,6 +123,8 @@ correct_password:
 	rjmp reset
 
 incorrect_password: 
+	ldi sequence, underscore
+	rcall display
 	rcall _delay9second
 	rjmp reset
 ; prescalar: 64 start value: 6
