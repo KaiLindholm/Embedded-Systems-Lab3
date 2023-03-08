@@ -22,34 +22,34 @@
   <FILE>Embedded-Lab3.lss</FILE>
  </OUTPUT_FILES>
  <LABELS>
-  <reset><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>33</LINE></reset>
-  <digits><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>222</LINE></digits>
-  <_delay10ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>129</LINE></_delay10ms>
-  <main><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>48</LINE></main>
-  <display><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>180</LINE></display>
-  <direction><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>58</LINE></direction>
-  <check_sequence><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>62</LINE></check_sequence>
-  <increment><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>71</LINE></increment>
-  <decrement><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>80</LINE></decrement>
-  <check_pass><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>90</LINE></check_pass>
-  <final><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>101</LINE></final>
-  <equal><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>96</LINE></equal>
-  <nonequal><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>99</LINE></nonequal>
-  <correct_password><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>106</LINE></correct_password>
-  <incorrect_password><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>110</LINE></incorrect_password>
-  <_delay9second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>169</LINE></_delay9second>
-  <_delay1ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>117</LINE></_delay1ms>
-  <wait><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>122</LINE></wait>
-  <wait10ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>132</LINE></wait10ms>
-  <_delay1second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>140</LINE></_delay1second>
-  <wait1sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>143</LINE></wait1sec>
-  <_delay2second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>152</LINE></_delay2second>
-  <_delay5second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>157</LINE></_delay5second>
-  <wait5sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>160</LINE></wait5sec>
-  <wait9sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>172</LINE></wait9sec>
-  <loop><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>188</LINE></loop>
-  <set_ser_in_1><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>195</LINE></set_ser_in_1>
-  <end><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>199</LINE></end>
-  <pass><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>227</LINE></pass>
+  <reset><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>35</LINE></reset>
+  <digits><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>230</LINE></digits>
+  <main><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>52</LINE></main>
+  <check_pass><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>94</LINE></check_pass>
+  <display><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>188</LINE></display>
+  <direction><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>65</LINE></direction>
+  <rtn><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>61</LINE></rtn>
+  <increment><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>73</LINE></increment>
+  <decrement><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>83</LINE></decrement>
+  <_delay1second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>148</LINE></_delay1second>
+  <final><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>109</LINE></final>
+  <equal><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>104</LINE></equal>
+  <nonequal><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>107</LINE></nonequal>
+  <correct_password><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>114</LINE></correct_password>
+  <incorrect_password><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>118</LINE></incorrect_password>
+  <_delay9second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>177</LINE></_delay9second>
+  <_delay1ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>124</LINE></_delay1ms>
+  <wait><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>129</LINE></wait>
+  <_delay10ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>137</LINE></_delay10ms>
+  <wait10ms><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>140</LINE></wait10ms>
+  <wait1sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>151</LINE></wait1sec>
+  <_delay2second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>160</LINE></_delay2second>
+  <_delay5second><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>165</LINE></_delay5second>
+  <wait5sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>168</LINE></wait5sec>
+  <wait9sec><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>180</LINE></wait9sec>
+  <loop><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>196</LINE></loop>
+  <set_ser_in_1><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>203</LINE></set_ser_in_1>
+  <end><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>207</LINE></end>
+  <pass><FILE>C:\Users\kaili\OneDrive\Documents\Spring2023\Embedded\Embedded-Lab3\Embedded-Lab3\main.asm</FILE><LINE>235</LINE></pass>
  </LABELS>
 </ASSEMBLER_INFO>

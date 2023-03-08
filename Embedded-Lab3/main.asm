@@ -14,10 +14,12 @@
 .def input = r19	   ; r18 is the value from the RPG 
 .def prevInput = r21
 .def temp = r18
+.def rpgBool = r17
 .def passcode = r22	
 .def passbool = r23
 .def passCount = r24
 .def mask = r25
+
 .cseg 
 .org 0x00
 ; Set SER (PB2), RCLK (PB3), and SRCLK (PB4) as outputs in PORTB
@@ -46,50 +48,56 @@ reset:
 	ldi		r30, low(digits<<1)
 	ldi		r31, high(digits<<1)
 	lpm		sequence, Z			; load 0 into sequence 
-	rcall _delay10ms
+;-----------------------------------------------
+	in		prevInput, PINB
+	andi	prevInput, 0x01		; extract previous A bit
 main:	
+	sbis	PINB, 5				; check the PB state
+	rcall	check_pass			; determine length of button press
 	rcall	display				; display a 0 to the 7-seg
-	in		input, PINB			; load in current state of RPG
-	andi	input, 0x03			; extract new input values
-	andi	mask, 0b11
-	cp		input, mask	
-	brne	direction			; if the current current state is not the same, determine the direction
 
+	in		input, PINB			; load in current state of RPG
+	andi	input, 0x01			; extract new input values 
+	cp		prevInput, input	 
+	brne	direction			; if the current current state is not the same, determine the direction
+rtn: 
+	mov		prevInput, input
 	rjmp	main				
 
-direction:	 
-	lsl mask 
-	lsl mask 
-	or mask, input
-check_sequence: 
-	cpi mask, 0b10000111	; CW
-	breq increment 	
-
-	cpi mask, 0b01001011	; CCW
-	breq decrement 
-
-rjmp main
+direction: 
+	in		temp, PINB
+	andi	temp, 0x02
+	lsr		temp
+	cp		input, temp
+	breq	increment 
+	rjmp	decrement 
 
 increment: 
-	ldi		mask, 0xff
 	cpi		value, 0x11			; if the value is 16, we have reached the max value that can be displayed do nothing
-	breq	main					
-	inc		value 
-	lpm		sequence, Z+
+	brge	main					
 
-	rjmp	main
+	inc		value 
+	lpm		sequence, Z+ 
+
+	mov		prevInput, temp		; store current input in prev input for next iteration 
+	rjmp	rtn
 
 decrement:
-	ldi mask, 0xff
 	cpi		value, 0x00
 	breq	reset
 
 	dec		value				; else decrement the value
 	sbiw	Z, 0x01				; decrement Z pointer by 1  
 	lpm		sequence, Z
-	rjmp	main
+
+	mov		prevInput, temp		; store current input in prev input for next iteration 
+	rjmp	rtn
 
 check_pass:						; only called once the pb has been pressed for less than a second 
+	rcall _delay1second 
+	sbis PINB, 5				; if the pin not has been depressed
+	rcall main					
+;--------------
 	inc passCount				; increment the number of digits inputted 
 	cpi passCount, 0x05			
 	brbc 1, final				; branch to final if the passcount is equal to 0b00011111
@@ -115,12 +123,9 @@ correct_password:
 	rjmp reset
 
 incorrect_password: 
-	ldi sequence, underscore
-	rcall display
 	rcall _delay9second
 	rjmp reset
-; prescalar: 64 start value: 131
-
+; prescalar: 64 start value: 6
 _delay1ms: 
 	push	temp
 	ldi		temp, 6
@@ -130,6 +135,7 @@ _delay1ms:
 		in		temp, TCNT0
 		cpi		temp, 0x00	; has the overflow bit been set
 		brne	wait
+
 	pop		temp
 	ret 
 		 
