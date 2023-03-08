@@ -9,11 +9,12 @@
 ;5555
 .equ dp = 0x80
 .equ underscore = 0x08
+.equ dash = 0x40
 .equ firstcode = 5
 .equ secondcode = 5
-.equ thirdcode = 5
-.equ fourthcode = 5
-.equ fifthcode = 5
+.equ thirdcode = 9
+.equ fourthcode = 6
+.equ fifthcode = 9
 .def value = r20       ; r20 is the value of the display 0-0, A-F
 .def sequence = r16    ; r16 is the value of the shift register to display a value
 .def input = r19	   ; r18 is the value from the RPG 
@@ -51,7 +52,8 @@ reset:
 	ldi		temp, 1 << TOIE0
 	sts		TIMSK0, temp	;Enable Timer/Counter0 Overflow interrrupt
 
-
+	ldi		sequence, dash 
+	rcall	display
 	ldi		r30, low(digits<<1)
 	ldi		r31, high(digits<<1)
 	lpm		sequence, Z			; load 0 into sequence 
@@ -63,15 +65,19 @@ main:
 	in		input, PINB
 	rcall	_delay10ms
 	sbrs	input, PB5			; check the PB state	
-	rcall	buttonPressed		; determine length of button press
-	rcall	display				; display a 0 to the 7-seg
+	rcall	buttonPressed		; determine length of button pressed			; display a 0 to the 7-seg
 
 	in		input, PINB			; load in current state of RPG
 	andi	input, 0x01			; extract new input values 
 	cp		prevInput, input	 
 	brne	direction			; if the current current state is not the same, determine the direction
 rtn: 
+	rcall	display
 	mov		prevInput, input
+	in		input, pinb
+	andi `	input, 0x03
+	cpi		input, 0x03
+	brne	rtn
 	rjmp	main		
 			
 buttonPressed:
@@ -107,31 +113,33 @@ direction:
 	rjmp	decrement 
 
 increment: 
-	cpi		value, 0x11			; if the value is 16, we have reached the max value that can be displayed do nothing
-	brge	main					
-
+	cpi		value, 0x10			; if the value is 16, we have reached the max value that can be displayed do nothing
+	breq	rtn					
+	
 	inc		value
-	lpm		sequence, Z+ 
-
+	adiw	Z, 1
+	lpm		sequence, Z 
+	rcall   display
 	mov		prevInput, temp		; store current input in prev input for next iteration 
 	rjmp	rtn
 
 decrement:
 	cpi		value, 0x00
-	breq	main
-
+	breq	finaldec
 	dec		value				; else decrement the value
 	sbiw	Z, 0x01				; decrement Z pointer by 1  
 	lpm		sequence, Z
-
+	rcall	display
 	mov		prevInput, temp		; store current input in prev input for next iteration 
 	rjmp	rtn
+finaldec:
+	rjmp rtn
 
 check_pass:						; only called once the pb has been pressed for less than a second 				
 ;--------------
 	rcall getCode
 	inc passIndex				; increment the number of digits inputted 
-	cpi passIndex, 0x07			
+	cpi passIndex, 0x06			
 	breq final					; branch to final if the passcount is equal to 
 
 	cp passcode, value 
@@ -148,7 +156,7 @@ check_pass:						; only called once the pb has been pressed for less than a seco
 		inc passbool
 		rjmp main	
 	final: 
-		cpi passbool, 5		; if the passCount has a value of 0b0011 1110 that means each sequence matched thus password is correct
+		cpi passbool, 4		; if the passCount has a value of 0b0011 1110 that means each sequence matched thus password is correct
 		breq correct_password 
 		rjmp incorrect_password 
 
@@ -310,7 +318,7 @@ end:
 digits: 
 	.db 0x3F, 0x06, 0x5B, 0x4F, 0x66, \
 	0x6D, 0x7D, 0x07, 0x7F, 0x6F, \
-	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
+	0x77, 0x7C, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
 ;55969
 pass: 
 	.db 5,5,9,6,9,0
