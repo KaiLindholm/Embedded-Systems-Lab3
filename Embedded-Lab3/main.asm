@@ -7,6 +7,8 @@
 
 .include "m328Pdef.inc"
 
+.equ dp = 0x80
+.equ underscore = 0x08
 .def value = r20       ; r20 is the value of the display 0-0, A-F
 .def sequence = r16    ; r16 is the value of the shift register to display a value
 .def input = r19	   ; r18 is the value from the RPG 
@@ -111,8 +113,13 @@ check_pass:						; only called once the pb has been pressed for less than a seco
 		breq correct_password 
 		rjmp incorrect_password 
 
-correct_password: 
-	; -
+correct_password:
+	cbi PORTB, PB5 
+	rcall _delay10ms
+	ldi sequence, dp
+	rcall display
+	sbi PORTB, PB5
+	rcall _delay5second
 	rjmp reset
 
 incorrect_password: 
