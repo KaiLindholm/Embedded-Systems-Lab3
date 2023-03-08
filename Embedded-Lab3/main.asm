@@ -38,140 +38,142 @@ reset:
 	out		TIFR0, temp		; CLear TOV0 / clear pending interrupts 
 	ldi		temp, 1 << TOIE0
 	sts		TIMSK0, temp	;Enable Timer/Counter0 Overflow interrrupt
-
 	ldi		value, 0x00			; the digit to display first is 0
 	clr		sequence
-
-	in		prevInput, PINB			
-	andi	prevInput, 0x03		; extract input values
-
+	ldi		mask, 0xff
 	ldi		r30, low(digits<<1)
 	ldi		r31, high(digits<<1)
 	lpm		sequence, Z			; load 0 into sequence 
-
-main:
+	rcall	_delay9second
+main:	
 	rcall	display				; display a 0 to the 7-seg
 	in		input, PINB			; load in current state of RPG
-
-	andi	input, 0x03			; extract new input values 
-	cp		prevInput, input	 
-	brne	direction		; if the current current state is not the same, determine the direction
+	andi	input, 0x03			; extract new input values
+	andi	mask, 0b11
+	cp		input, mask	
+	brne	direction			; if the current current state is not the same, determine the direction
 
 	rjmp	main				
 
-direction: 
-	in		input, PINB			; load in the current state again 
-	andi	input, 0x03			; extract input pins  
+direction:	 
+	lsl mask 
+	lsl mask 
+	or mask, input
+check_sequence: 
+	cpi mask, 0b10000111	; CW
+	breq increment 	
 
-	cp		input, prevInput	; check if they still are different 
-	breq	main
+	cpi mask, 0b01001011	; CCW
+	breq decrement 
 
-	mov		temp, input			; store input in temp register
-	push	input
+rjmp main
 
-	andi	input, 0x02			; extract B bit from input			
-	lsr		input				; shift B bit to LSB
-
-	andi	prevInput, 0x01		; extract A bit from the prev input
-
-	cp		input, prevInput			
-	breq	decrement			; if the A and B bit are equal RPG is moving CCW
-
-	cpi		value, 0x10			; if the value is 16, we have reached the max value that can be displayed do nothing
+increment: 
+	ldi		mask, 0xff
+	cpi		value, 0x11			; if the value is 16, we have reached the max value that can be displayed do nothing
 	breq	main					
-
 	inc		value 
-	lpm		sequence, Z			
-	adiw	Z, 1			; increment Z pointer 
+	lpm		sequence, Z+
 
-	pop 	prevInput			; store current input in prev input for next iteration 
-
-	jmp	main
+	rjmp	main
 
 decrement:
+	ldi mask, 0xff
 	cpi		value, 0x00
 	breq	reset
 
 	dec		value				; else decrement the value
 	sbiw	Z, 0x01				; decrement Z pointer by 1  
 	lpm		sequence, Z
-
-	pop		prevInput			; store current input in prev input for next iteration 
 	rjmp	main
 
 check_pass:						; only called once the pb has been pressed for less than a second 
 	inc passCount				; increment the number of digits inputted 
 	cpi passCount, 0x05			
-	brbc 1, final
+	brbc 1, final				; branch to final if the passcount is equal to 0b00011111
 	cp passcode, sequence 
 	breq equal
 	equal: 
-		ldi mask, 0x01			; load the mask with 1
 		ori passbool, 0x01		; load 1 into LSB 
 		lsl passbool			; shift LSB 
 	nonequal:
 		lsl passbool			; shift a 0 into the LSB 
 	final: 
-		cpi passCount, 0x1F		; if the passCOunt has a value of 0b00011111 that means each sequence matched thus password is correct
+		cpi passCount, 0x1F		; if the passCount has a value of 0b00011111 that means each sequence matched thus password is correct
 		breq correct_password 
 		rjmp incorrect_password 
 
 correct_password: 
-	
+	; -
 	rjmp reset
 
 incorrect_password: 
 
+	
+	rcall _delay9second
 	rjmp reset
 ; prescalar: 64 start value: 131
-_delay500us: 
-	ldi		temp, 131
-	out		TCNT0, temp
 
+_delay1ms: 
+	ldi		mask, 6
+	out		TCNT0, mask
+	clr		mask
 	wait: 
-		in		temp, TCNT0
-		cpi		temp, 0x00	; has the overflow bit been set
+		in		mask, TCNT0
+		cpi		mask, 0x00	; has the overflow bit been set
 		brne	wait
 
 	ret 
 		 
 _delay10ms:
-	clr		temp 
+	push temp
+	clr temp
 	wait10ms: 
-		rcall	_delay500us 
+		rcall	_delay1ms 
 		inc		temp
-		cpi		temp, 20
+		cpi		temp, 10
 		brne	wait10ms
+	pop temp
 	ret 
 		
 _delay1second: 
+	push temp
 	clr temp
 	wait1sec: 
 		rcall _delay10ms 
 		inc temp
-		cpi temp, 100
+		cpi temp, 10
 		brne wait1sec
+
+	pop temp
 	ret
+
 _delay2second: 
 	rcall _delay1second
 	rcall _delay1second 
 	ret 
 
-_delay5second: 
+_delay5second:
+	push temp 
 	clr temp 
 	wait5sec: 
 		rcall _delay1second
 		inc temp
 		cpi temp, 5 
 		brne wait5sec
+
+	pop temp
 	ret
+
 _delay9second: 
+	push temp
 	clr temp 
 	wait9sec: 
 		rcall _delay1second
 		inc temp
 		cpi temp, 9 
 		brne wait5sec
+	pop temp
 	ret
 
 display:
