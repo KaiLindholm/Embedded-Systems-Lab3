@@ -6,28 +6,32 @@
 
 
 .include "m328Pdef.inc"
-
+;5555
 .equ dp = 0x80
 .equ underscore = 0x08
+.equ firstcode = 5
+.equ secondcode = 5
+.equ thirdcode = 5
+.equ fourthcode = 5
+.equ fifthcode = 5
 .def value = r20       ; r20 is the value of the display 0-0, A-F
 .def sequence = r16    ; r16 is the value of the shift register to display a value
 .def input = r19	   ; r18 is the value from the RPG 
 .def prevInput = r21
 .def temp = r18
-.def rpgBool = r17
 .def passcode = r22	
 .def passbool = r23
-.def passCount = r24
-.def mask = r25
+.def passIndex = r24
+.def button = r25
 
 .cseg 
-.org 0x00
+.org	0x00
 ; Set SER (PB2), RCLK (PB3), and SRCLK (PB4) as outputs in PORTB
 ; pin A - PB0 pin B - PB1 
 ; Pushbutton - PB5
-clr temp
-ldi temp, (1<<DDB2) | (1<<DDB3) | (1<<DDB4)
-out DDRB, temp
+clr		temp
+ldi		temp, (1<<DDB2) | (1<<DDB3) | (1<<DDB4)
+out		DDRB, temp
 nop
 ldi		temp, LOW(RAMEND)
 out		SPL, temp
@@ -36,15 +40,18 @@ out		SPH, temp
 
 reset: 
 	clr		temp
+	clr		sequence
+	clr		passbool
+	ldi		passIndex, 1 
+	ldi		value, 0x00			; the digit to display first is 0
 	ldi		temp, (1<<CS01) | (1<<CS00)
 	out		TCCR0B, temp	; Timer clock = system clock / 64
 	ldi		temp, 1 << TOV0
 	out		TIFR0, temp		; CLear TOV0 / clear pending interrupts 
 	ldi		temp, 1 << TOIE0
 	sts		TIMSK0, temp	;Enable Timer/Counter0 Overflow interrrupt
-	ldi		value, 0x00			; the digit to display first is 0
-	clr		sequence
-	ldi		mask, 0xff
+
+
 	ldi		r30, low(digits<<1)
 	ldi		r31, high(digits<<1)
 	lpm		sequence, Z			; load 0 into sequence 
@@ -52,8 +59,11 @@ reset:
 	in		prevInput, PINB
 	andi	prevInput, 0x01		; extract previous A bit
 main:	
-	sbis	PINB, 5				; check the PB state
-	rcall	check_pass			; determine length of button press
+
+	in		input, PINB
+	rcall	_delay10ms
+	sbrs	input, PB5			; check the PB state	
+	rcall	buttonPressed		; determine length of button press
 	rcall	display				; display a 0 to the 7-seg
 
 	in		input, PINB			; load in current state of RPG
@@ -62,7 +72,31 @@ main:
 	brne	direction			; if the current current state is not the same, determine the direction
 rtn: 
 	mov		prevInput, input
-	rjmp	main				
+	rjmp	main		
+			
+buttonPressed:
+	rcall _delay10ms
+	checkReset: 
+		in input, PINB
+		sbrs input, PB5
+		rjmp resetCounter	
+	clr r28
+	sbrc input, PB5
+	rjmp check_pass
+	rjmp main
+
+resetchecksum:
+	in input, PINB
+	sbrc input, PB5
+	rjmp reset
+	rjmp resetchecksum
+
+resetCounter: 
+	rcall _delay10ms
+	inc r28
+	cpi R28, 200
+	breq resetchecksum
+	rjmp checkReset
 
 direction: 
 	in		temp, PINB
@@ -76,7 +110,7 @@ increment:
 	cpi		value, 0x11			; if the value is 16, we have reached the max value that can be displayed do nothing
 	brge	main					
 
-	inc		value 
+	inc		value
 	lpm		sequence, Z+ 
 
 	mov		prevInput, temp		; store current input in prev input for next iteration 
@@ -84,7 +118,7 @@ increment:
 
 decrement:
 	cpi		value, 0x00
-	breq	reset
+	breq	main
 
 	dec		value				; else decrement the value
 	sbiw	Z, 0x01				; decrement Z pointer by 1  
@@ -93,25 +127,63 @@ decrement:
 	mov		prevInput, temp		; store current input in prev input for next iteration 
 	rjmp	rtn
 
-check_pass:						; only called once the pb has been pressed for less than a second 
-	rcall _delay1second 
-	sbis PINB, 5				; if the pin not has been depressed
-	rcall main					
+check_pass:						; only called once the pb has been pressed for less than a second 				
 ;--------------
-	inc passCount				; increment the number of digits inputted 
-	cpi passCount, 0x05			
-	brbc 1, final				; branch to final if the passcount is equal to 0b00011111
-	cp passcode, sequence 
+	rcall getCode
+	inc passIndex				; increment the number of digits inputted 
+	cpi passIndex, 0x07			
+	breq final					; branch to final if the passcount is equal to 
+
+	cp passcode, value 
 	breq equal
+	nonequal: 
+		rjmp main
 	equal: 
-		ori passbool, 0x01		; load 1 into LSB 
-		lsl passbool			; shift LSB 
-	nonequal:
-		lsl passbool			; shift a 0 into the LSB 
+		mov temp, sequence 
+		ldi sequence, dp
+		rcall display
+		mov sequence, temp
+		rcall _delay1second
+		rcall display
+		inc passbool
+		rjmp main	
 	final: 
-		cpi passCount, 0x1F		; if the passCount has a value of 0b00011111 that means each sequence matched thus password is correct
+		cpi passbool, 5		; if the passCount has a value of 0b0011 1110 that means each sequence matched thus password is correct
 		breq correct_password 
 		rjmp incorrect_password 
+
+getCode: 
+	cpi passIndex, 1
+	breq first
+
+	cpi passIndex, 2
+	breq second
+	
+	cpi passIndex, 3
+	breq third
+	
+	cpi passIndex, 4
+	breq fourth
+	
+	cpi passIndex, 5
+	breq fifth
+ 
+first: 
+	ldi passcode, firstcode
+	ret 
+second: 
+	ldi passcode, secondcode
+	ret 
+third: 
+	ldi passcode, thirdcode
+	ret 
+fourth: 
+	ldi passcode, fourthcode
+	ret 
+fifth: 
+	ldi passcode, fifthcode
+	ret 
+
 
 correct_password:
 	cbi PORTB, PB5 
@@ -123,8 +195,11 @@ correct_password:
 	rjmp reset
 
 incorrect_password: 
+	ldi sequence, underscore
+	rcall display
 	rcall _delay9second
 	rjmp reset
+
 ; prescalar: 64 start value: 6
 _delay1ms: 
 	push	temp
@@ -156,7 +231,7 @@ _delay1second:
 	wait1sec: 
 		rcall _delay10ms 
 		inc temp
-		cpi temp, 10
+		cpi temp, 100
 		brne wait1sec
 
 	pop temp
@@ -238,4 +313,4 @@ digits:
 	0x77, 0xFC, 0x39, 0x5E, 0x79, 0x79, 0x71, 0
 ;55969
 pass: 
-	.db 0x6D,0x6D,0x6F,0x7D,0x6F,0
+	.db 5,5,9,6,9,0
